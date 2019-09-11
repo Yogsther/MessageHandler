@@ -25,6 +25,12 @@ public class Message {
             this.updatedAt = new Date();
         }
 
+        public Update(String author, String previousMessage, Date time) {
+            this.author = author;
+            this.previousMessage = previousMessage;
+            this.updatedAt = time;
+        }
+
         /**
          * Get prior message before this update
          *
@@ -73,6 +79,18 @@ public class Message {
         updates = new ArrayList<Update>();
     }
 
+    public Message(String message, Date created, Date updated, String author, int id) throws StringTooLongException {
+        if (message.length() > MESSAGE_LENGTH)
+            throw new StringTooLongException();
+
+        this.id = id;
+        this.createdAt = created;
+        this.updatedAt = updated;
+        this.message = message;
+        this.author = author;
+        updates = new ArrayList<Update>();
+    }
+
     /**
      * Updates the message content
      *
@@ -81,10 +99,21 @@ public class Message {
     public void update(String message) throws StringTooLongException {
         if (message.length() > MESSAGE_LENGTH)
             throw new StringTooLongException();
-        String newAuthor = System.getProperty("user.name");
         this.updates.add(new Update(author, this.message));
         this.message = message;
-        this.author = author;
+    }
+
+    /**
+     * Only used to load old messages, overwrites time and author for each edit
+     * @param message
+     * @param author
+     * @param time
+     * @throws StringTooLongException
+     */
+    public void updateBackLog(String message, String author, Date time) throws StringTooLongException {
+        if (message.length() > MESSAGE_LENGTH)
+            throw new StringTooLongException();
+        this.updates.add(new Update(author, this.message, time));
     }
 
     /**
@@ -128,7 +157,7 @@ public class Message {
             build += "\n↪ ORIGINAL BY " + this.author + ": " + updates.get(0).getPreviousMessage() + " CREATED: " + this.createdAt.toString();
         for (int i = 0; i < updates.size(); i++) {
             Update update = updates.get(i);
-            build += "\n↪ REVISION BY " + update.getAuthor() + ": " + (updates.size() - 1 == i ? this.message : update.getPreviousMessage()) + " UPDATED: " + update.getDate();
+            build += "\n    > REVISION BY " + update.getAuthor() + ": " + (updates.size() - 1 == i ? this.message : update.getPreviousMessage()) + " UPDATED: " + update.getDate();
         }
         return build;
     }
