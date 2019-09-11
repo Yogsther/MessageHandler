@@ -1,3 +1,6 @@
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -20,47 +23,77 @@ public class main {
                     }
                 }
             }, "Create a new message"),
-            // TODO:::
+
             new Command("view (message id)", new Command.CommandCallback() {
                 @Override
                 public void call(String input) {
                     int id = -1;
-                    if(input.length() > 0){
-                        try{
+                    if (input.length() > 0) {
+                        try {
                             id = Integer.parseInt(input);
-                        } catch(NumberFormatException e) {
+                        } catch (NumberFormatException e) {
                             System.out.println("ID must be an int");
                             return;
                         }
                     }
-                    System.out.println("ID: " + id);
-                    for(Message message: messages){
-                        if(id == message.getId() || id == -1) System.out.println(message.toString());
+
+                    for (Message message : messages) {
+                        if (id == message.getId() || id == -1) System.out.println(message.toString());
                     }
                 }
             }, "View all messages in memory"),
             new Command("update [message id] [new message]", new Command.CommandCallback() {
                 @Override
                 public void call(String input) throws WrongFormatException {
-                    if(input.length() > 3 && input.contains(" ")){
-                        try{
+                    if (input.length() > 3 && input.contains(" ")) {
+                        try {
                             int id = Integer.parseInt(input.substring(0, input.indexOf(" ")));
                             String newMessage = input.substring(input.indexOf(" ") + 1);
-                            for(Message message : messages){
-                                if(message.getId() == id){
+                            for (Message message : messages) {
+                                if (message.getId() == id) {
                                     message.update(newMessage);
                                 }
                             }
-                        } catch(NumberFormatException e){
+                        } catch (NumberFormatException e) {
                             System.out.println("ID must be an int");
-                        } catch(StringTooLongException e){
+                        } catch (StringTooLongException e) {
                             System.out.println("Message length is too long!");
                         }
                     } else {
                         throw new WrongFormatException();
                     }
                 }
-            })
+            }, "Update an existing message"),
+            new Command("save (path)", new Command.CommandCallback() {
+                @Override
+                public void call(String input) throws WrongFormatException {
+                    JSONArray save = new JSONArray();
+                    for(Message message : messages){
+                        JSONObject messageSaved = new JSONObject();
+                        messageSaved.put("message", message.getMessage());
+                        messageSaved.put("author", message.getAuthor());
+                        messageSaved.put("created", message.getCreatedAt().getTime());
+                        messageSaved.put("updated", message.getUpdatedAt().getTime());
+                        JSONArray updates = new JSONArray();
+                        for(Message.Update update : message.getUpdates()){
+                            JSONObject updateSaved = new JSONObject();
+                            updateSaved.put("author", update.getAuthor());
+                            updateSaved.put("previous_message", update.getPreviousMessage());
+                            updateSaved.put("created", update.getDate().getTime());
+                            updates.add(updateSaved);
+                        }
+                        messageSaved.put("updates", updates);
+                        save.add(messageSaved);
+                    }
+                    System.out.println(save.toString());
+                }
+            }),
+            new Command("exit", new Command.CommandCallback() {
+                @Override
+                public void call(String input) throws WrongFormatException {
+                    System.exit(0);
+                }
+            }, "Terminates the application")
     };
 
     public static void main(String[] args) throws StringTooLongException {
@@ -69,7 +102,7 @@ public class main {
         scanner = new Scanner(System.in);
 
         System.out.println("Welcome to Message creator, here are the commands. [required] (optional)");
-        for(Command command : commands){
+        for (Command command : commands) {
             System.out.println(command.getFullCommand() + "\n      " + command.getDescription());
         }
 
@@ -77,17 +110,17 @@ public class main {
         awaitInput();
     }
 
-    private static void awaitInput(){
+    private static void awaitInput() {
         System.out.print(": ");
         String input = scanner.nextLine();
 
-        int first_space = (input.contains(" ") ? input.indexOf(" "): input.length());
+        int first_space = (input.contains(" ") ? input.indexOf(" ") : input.length());
         String input_command = input.substring(0, first_space);
-        String input_value = input.substring(input.length() >= first_space+1 ? first_space+1 : first_space);
+        String input_value = input.substring(input.length() >= first_space + 1 ? first_space + 1 : first_space);
 
         boolean command_found = false;
-        for(Command command : commands){
-            if(command.getCommand().equals(input_command)){
+        for (Command command : commands) {
+            if (command.getCommand().equals(input_command)) {
                 command_found = true;
                 try {
                     command.call(input_value);
@@ -97,7 +130,7 @@ public class main {
                 break;
             }
         }
-        if(!command_found) System.out.println("Command " + input_command + " is not recognized");
+        if (!command_found) System.out.println("Command '" + input_command + "' is not recognized");
         awaitInput();
     }
 
