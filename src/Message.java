@@ -154,7 +154,7 @@ public class Message {
     public String toString() {
         String build = "[ID: " + this.id + "] " + this.author + ": " + this.message + " CREATED: " + this.createdAt.toString();
         if (updates.size() > 0)
-            build += "\n↪ ORIGINAL BY " + this.author + ": " + updates.get(0).getPreviousMessage() + " CREATED: " + this.createdAt.toString();
+            build += "\n    > ORIGINAL BY " + this.author + ": " + updates.get(0).getPreviousMessage() + " CREATED: " + this.createdAt.toString();
         for (int i = 0; i < updates.size(); i++) {
             Update update = updates.get(i);
             build += "\n    > REVISION BY " + update.getAuthor() + ": " + (updates.size() - 1 == i ? this.message : update.getPreviousMessage()) + " UPDATED: " + update.getDate();

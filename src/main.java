@@ -6,7 +6,6 @@ import org.json.simple.parser.ParseException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -101,7 +100,7 @@ public class main {
                         System.out.println("Please enter a valid path or nothing at all.");
                     }
                 }
-            }),
+            }, "Save all messages to a JSON (default: save.json)"),
             new Command("load [path/file]", new Command.CommandCallback() {
                 @Override
                 public void call(String input) throws WrongFormatException {
@@ -129,7 +128,7 @@ public class main {
                     }
 
                 }
-            }),
+            }, "Load messages from a JSON"),
             new Command("exit", new Command.CommandCallback() {
                 @Override
                 public void call(String input) throws WrongFormatException {
