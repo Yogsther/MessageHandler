@@ -3,7 +3,7 @@ public class Command {
     private String command, description;
 
     interface CommandCallback {
-        void call(String input);
+        void call(String input) throws WrongFormatException;
     }
 
     public Command(String command, CommandCallback callback, String description){
@@ -18,7 +18,7 @@ public class Command {
         this.description = "This command is missing a description";
     }
 
-    public void call(String input){
+    public void call(String input) throws WrongFormatException {
         this.callback.call(input);
     }
 

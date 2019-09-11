@@ -59,6 +59,7 @@ public class Message {
         if(message.length() > MESSAGE_LENGTH)
             throw new StringTooLongException();
 
+        this.id = id;
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.message = message;
@@ -81,16 +82,24 @@ public class Message {
     }
 
     /**
+     * Get ID of message
+     * @return returns the ID's message
+     */
+    public int getId(){
+        return this.id;
+    }
+
+    /**
      * Get the entire message, author and date + all revisions of the message-content.
      * @return Message and all it's history in a String
      */
     @Override
     public String toString(){
-        String build = this.author + ": " + this.message + " CREATED: " + this.createdAt.toString();
-        if(updates.size() > 0) build += "\nORIGINAL BY  " + this.author + ": " + updates.get(0).getPreviousMessage() + " CREATED: " + this.createdAt.toString();
+        String build = "[ID: " + this.id + "] " + this.author + ": " + this.message + " CREATED: " + this.createdAt.toString();
+        if(updates.size() > 0) build += "\n↪ ORIGINAL BY " + this.author + ": " + updates.get(0).getPreviousMessage() + " CREATED: " + this.createdAt.toString();
         for(int i = 0; i < updates.size(); i++){
             Update update = updates.get(i);
-            build += "\nREVISION BY  " + update.getAuthor() + ": " + (updates.size()-1 == i ? this.message : update.getPreviousMessage()) + " UPDATED: " + update.getDate();
+            build += "\n↪ REVISION BY " + update.getAuthor() + ": " + (updates.size()-1 == i ? this.message : update.getPreviousMessage()) + " UPDATED: " + update.getDate();
         }
         return  build;
     }
